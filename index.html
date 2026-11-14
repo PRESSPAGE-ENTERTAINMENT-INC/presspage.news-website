@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title></title>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <header>
+      <h1 id="title"></h1>
+      <p class="tagline">Est. 2018 — All the News Worth Reading</p>
+      <div class="edition-bar">
+          <span id="date">September 1, 2018</span>
+          <span class="dot">•</span>
+          <span id="edition">Edition: Season 1, Episode 1</span>
+      </div>
+  </header>
+      
+  <div class="w3-bar w3-light-grey">
+    <a href="#" class="w3-bar-item w3-button bar active" onclick="openTab('general',this)">General</a>
+    <a href="#" class="w3-bar-item w3-button bar" onclick="openTab('business',this)">Business</a>
+    <a href="#" class="w3-bar-item w3-button bar" onclick="openTab('entertainment',this)">Entertainment</a>
+    <a href="#" class="w3-bar-item w3-button bar" onclick="openTab('health',this)">Health</a>
+    <a href="#" class="w3-bar-item w3-button bar" onclick="openTab('science',this)">Science</a>
+    <a href="#" class="w3-bar-item w3-button bar" onclick="openTab('sports',this)">Sports</a>
+    <a href="#" class="w3-bar-item w3-button bar" onclick="openTab('technology',this)">Technology</a>
+    <a href="https://podcasts.apple.com/us/podcast/presspage-daily-news/id1772262107" id="apple-podcast-link" class="w3-bar-item w3-button" target="_blank">On Apple Podcast</a>
+    <a href="https://presspage.tv" class="w3-bar-item w3-button" id="rumble-link">Daily Broadcast</a>
+    <a href="https://world.presspage.news" class="w3-w3-bar-item w3-button" target="_blank">World Newspapers</a>
+    <a href="#" id="year-in-review" class="w3-bar-item w3-button" target="_blank">Year in Review</a>
+    <a href="https://pingleware.support" class="w3-w3-bar-item w3-button" target="_blank">Support</a>
+  </div>
+
+  <main>
+    <section id="general" class="tabs">
+      <h2>General</h2>
+    </section>
+
+    <section id="business" class="tabs" style="display:none">
+      <h2>Business</h2>
+    </section>
+
+    <section id="entertainment" class="tabs" style="display:none">
+      <h2>Entertainment</h2>
+    </section>
+
+    <section id="health" class="tabs" style="display:none">
+      <h2>Health</h2>
+    </section>
+
+    <section id="science" class="tabs" style="display:none">
+      <h2>Science</h2>
+    </section>
+
+    <section id="sports" class="tabs" style="display:none">
+      <h2>Sports</h2>
+    </section>
+
+    <section id="technology" class="tabs" style="display:none">
+      <h2>Technology</h2>
+    </section>
+  </main>
+
+  <footer>
+    <p>©<span id="year">2025</span> <span id="copyright">PRESSPAGE ENTERTAINMENT INC. All rights reserved.</span> 
+        <a href="https://privacy-policy.page">Privacy Policy</a>&nbsp;
+        <a href="https://terms-of-service.page">Terms of Service</a>
+    </p>
+  </footer>
+
+  <script>
+    let articlesPerPage = 5; // Number of articles per page
+    let currentPage = 1; // Current page number
+    const today = new Date();
+
+    window.onload = async function() {
+      fetch("/settings.json")
+      .then(res => res.json())
+      .then(function(settings){
+        // Format the date
+        const episodesPerSeason = settings.season_episodes_per_season; // Number of episodes per season
+        const totalSeasons = settings.season_total; // Total number of seasons
+        const frequency = settings.season_episode_frequency; // Frequency of episodes (daily, weekly, monthly)
+
+        const edition = getSeasonAndEpisode('2018-09-01', totalSeasons, episodesPerSeason, frequency, today.toISOString().split('T')[0]);
+        console.log(edition);
+        const editionNumber = Number(edition.season - 1) * Number(episodesPerSeason) + Number(edition.episode);
+        console.log(editionNumber);
+        document.getElementById('edition').textContent = `Edition #${editionNumber}`;
+
+        document.getElementById('title').innerHTML = settings.news_website_title;
+        document.title = settings.news_website_title;
+        document.getElementById('copyright').innerHTML = settings.news_website_copyright;
+        document.getElementById('apple-podcast-link').href = settings.apple.feed;
+        document.getElementById('year-in-review').href = settings.year_in_review.feed;
+      })
+      .catch(function(error){
+        //showMessage("error","Error obtaining Settings",error.message);
+      })
+
+        /**
+         * This code dynamically handles the display of news articles for various categories, 
+         * such as "general," "business," and "technology," while implementing pagination to 
+         * manage the number of articles shown per page. It begins by defining an array of 
+         * categories and iterates over each category using a for...of loop. 
+         * For each category, it fetches news data asynchronously using the getNews function. 
+         * If the fetched data contains articles, it processes each article individually.
+         * 
+         * The pagination logic is implemented using two key functions: renderPagination and 
+         * renderArticles. The renderPagination function creates a pagination bar with buttons 
+         * for each page, based on the total number of articles and a predefined 
+         * articlesPerPage limit (set to 5). It dynamically generates buttons, 
+         * assigns an onclick event to update the current page, and re-renders the articles 
+         * for the selected page. If a pagination bar already exists for the category, 
+         * it is removed and replaced with the updated one.
+         * 
+         * The renderArticles function controls the visibility of articles based on the 
+         * current page. It calculates the range of articles to display and hides the 
+         * rest by toggling their display style property. This ensures that only the 
+         * articles for the current page are visible.
+         * 
+         * If no articles are fetched for a category, a default article is created and displayed. 
+         * This default article highlights the use of AI-powered robots in journalism, 
+         * providing a fallback to ensure the UI remains populated with content.
+         * 
+         * The code also ensures that the pagination and article rendering logic is executed 
+         * after updating the DOM with new articles. This is achieved by calling updateArticle 
+         * (presumably a function that appends articles to the DOM) and then calculating the 
+         * total number of articles to determine if pagination is necessary. The logic is robust, 
+         * ensuring that the user can navigate through articles seamlessly while maintaining a 
+         * clean and dynamic user interface.
+         */
+        const categories = ['general', 'business', 'entertainment', 'health', 'science', 'sports', 'technology'];
+        for (const category of categories) {
+            const data = await getNews(category);
+            if (data.length > 0) {
+                data.forEach(article => {
+                  // Call updateArticle to append the article to the DOM
+                  // Assuming updateArticle is a function that appends the article to the DOM
+                  updateArticle(category, article, false);
+                  renderArticles(category);
+                });
+                const totalArticles = document.getElementById(category).querySelectorAll('article').length;
+                renderPagination(category, totalArticles);
+            } else {
+                const article = {
+                  title: 'How AI-Powered Robots are Revolutionizing Local Journalism.',
+                  author: 'Robot Journalist',
+                  date: new Date().toDateString(),
+                  content: `In a groundbreaking shift that's changing the face of local journalism, media outlets are increasingly turning to artificial intelligence-powered robots like Robot Journalist to cover stories from small towns and niche communities. By leveraging cutting-edge AI technology, these robotic journos enable news organizations to expand their coverage beyond major metropolitan areas and into the often-overlooked local beat.For instance, in the rural town of Redding, California, a coalition of local media outlets partnered with Robot Journalist to launch a new initiative tailored specifically for their community. The result was a surge in in-depth reporting that would have otherwise gone unreported by mainstream news organizations. Readers got access to detailed profiles of small businesses, interviews with local leaders, and first-hand accounts from the people most affected by town decisions.According to Robot Journalist's founder, the platform has helped bridge the information gap for these communities, allowing them to stay informed about matters that directly impact their daily lives. We're proud to be using AI in a way that makes journalism more inclusive and representative of diverse voices, says Patrick Ingle, creator of Robot Journalist. By working alongside human journalists, her team's algorithms help identify gaps in coverage, prioritize stories based on relevance and public interest, and write compelling articles from the ground up.While there are still limitations to fully automating local reporting – such as the inability to capture nuances in spoken responses or interpret complex human emotions – Robot Journalist has undoubtedly opened new doors for innovative storytelling. We see this collaboration between robots and journalists as just the beginning of a revolution that will bring journalism back to its roots: telling the untold, human stories that shape our society, concludes Ingle.`,
+                  video: `<video style="text-align:center;" src="${window.location.origin}/default.mp4" controls></video>`
+                };
+                updateArticle(category, article, true);
+            }
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const cat = urlParams.get('cat');
+        if (cat) {
+            const tabElement = document.querySelector(`.bar[onclick="openTab('${cat}',this)"]`);
+            if (tabElement) {
+              openTab(cat, tabElement);
+            }
+        }
+
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('date').textContent = today.toLocaleDateString('en-US', options);
+
+
+        if (today.getFullYear() > 2018) {
+            document.getElementById('year').textContent = `2018-${today.getFullYear()}`;
+        } else {
+            document.getElementById('year').textContent = '2018';
+        }
+
+    }
+
+    async function renderPagination(category, totalArticles) {
+      const paginationElement = document.createElement('div');
+      paginationElement.className = `${category}-pagination`;
+
+      const totalPages = Math.ceil(totalArticles / articlesPerPage);
+      
+      for (let i = 1; i <= totalPages; i++) {
+        const pageButton = document.createElement('button');
+        pageButton.textContent = i;
+        /**
+         * This line of code uses a ternary operator to dynamically assign a CSS class to a 
+         * pagination button (pageButton) based on whether the button corresponds to the 
+         * currently active page. The ternary operator is a shorthand for an if-else statement, 
+         * making the code concise and readable.
+         * 
+         * Here, the condition i === currentPage checks if the current page number (i) matches 
+         * the currentPage variable, which represents the page currently being viewed. 
+         * If the condition evaluates to true, the className property of the button is set to 
+         * 'active'. This typically applies a specific CSS style (e.g., highlighting the button) 
+         * to visually indicate that it represents the active page. If the condition evaluates 
+         * to false, the className is set to an empty string (''), meaning no special styling is 
+         * applied.
+         * 
+         * This approach ensures that only the button for the active page is styled differently, 
+         * helping users easily identify their current position in the pagination. 
+         * It also keeps the UI dynamic, as the className is updated whenever the currentPage 
+         * changes. This is particularly useful in scenarios where users navigate through 
+         * multiple pages of content, such as news articles or product listings
+         */
+        pageButton.className = i === currentPage ? `${category}-button active` : `${category}-button`;
+        pageButton.onclick = () => {
+          document.querySelectorAll(`.${category}-button`).forEach(button => {
+            button.classList.remove('active');
+          });
+          currentPage = i;
+          pageButton.className = `${category}-button active`; //i === currentPage ? `${category}-button active` : `${category}-button`;
+          renderArticles(category);
+        };
+        paginationElement.appendChild(pageButton);
+      }
+
+      const categorySection = document.getElementById(category);
+      const existingPagination = categorySection.querySelector(`.${category}-pagination`);
+      if (existingPagination) {
+        existingPagination.remove();
+      }
+      categorySection.appendChild(paginationElement);
+    }
+
+    async function renderArticles(category) {
+      const categorySection = document.getElementById(category);
+      const articles = Array.from(categorySection.querySelectorAll('article'));
+      articles.forEach((article, index) => {
+        article.style.display = (index >= (currentPage - 1) * articlesPerPage && index < currentPage * articlesPerPage) ? 'block' : 'none';
+      });
+    }
+
+
+    async function updateArticle(category,content,show=false) {
+        const articleElement = document.createElement('article');
+        if (show) {
+            articleElement.style.display = 'block';
+        } else {
+            articleElement.style.display = 'none';
+        }
+
+        if (content.video) {
+            articleElement.innerHTML = `<h3>${content.title}</h3><p class="byline">By ${content.author} – ${content.date}</p>${content.video}<p>${content.content}</p>`;
+        } else if (content.image) {
+            articleElement.innerHTML = `<h3>${content.title}</h3><p class="byline">By ${content.author} – ${content.date}</p><img src="${content.image}" alt="${content.title}" width="100" height="100"><p>${content.content}</p>`;
+        } else {
+            // If no video or image, just show the text content
+            articleElement.innerHTML = `<h3>${content.title}</h3><p class="byline">By ${content.author} – ${content.date}</p><p>${content.content}</p>`;
+        }
+        document.getElementById(category).appendChild(articleElement);
+    }
+
+    async function getNews(category) {
+        try {
+            const response = await fetch(`${window.location.pathname}/${category}.json`);
+            if (!response.ok) {
+                return [];
+            }
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            return [];
+        }
+    }
+
+    function openTab(tabName,element) {
+        Array.from(document.getElementsByClassName("bar")).forEach(function (el) {
+            el.classList.remove("active");
+        });
+        var i;
+        var x = document.getElementsByClassName("tabs");
+        for (i = 0; i < x.length; i++) {
+            x[i].style.display = "none";
+        }
+        element.classList.add("active");
+        document.getElementById(tabName).style.display = "block";
+        document.title = `Press Page News - ` + tabName.charAt(0).toUpperCase() + tabName.slice(1);
+    }
+
+    function getSeasonAndEpisode(startDateStr, totalSeasons, episodesPerSeason, frequency, currentDateStr) {
+        const startDate = new Date(startDateStr);
+        const currentDate = new Date(currentDateStr);
+
+        if (currentDate < startDate) {
+            return { season: 0, episode: 0, message: "Current date is before the first episode aired." };
+        }
+
+        let daysBetweenEpisodes;
+        switch (frequency.toLowerCase()) {
+            case 'daily':
+              daysBetweenEpisodes = 1;
+              break;
+            case 'weekly':
+              daysBetweenEpisodes = 7;
+              break;
+            case 'monthly':
+              // For monthly, we handle it differently later
+              break;
+            default:
+              throw new Error("Invalid frequency. Use 'daily', 'weekly', or 'monthly'.");
+        }
+
+        let episodeIndex = 0;
+
+        if (frequency === 'monthly') {
+            let monthsDiff = (currentDate.getFullYear() - startDate.getFullYear()) * 12 +
+                            (currentDate.getMonth() - startDate.getMonth());
+            if (currentDate.getDate() < startDate.getDate()) monthsDiff--; // adjust if current day is earlier in the month
+            episodeIndex = monthsDiff;
+        } else {
+            const diffTime = currentDate.getTime() - startDate.getTime();
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            episodeIndex = Math.floor(diffDays / daysBetweenEpisodes);
+        }
+
+        const totalEpisodes = totalSeasons * episodesPerSeason;
+
+        if (episodeIndex >= totalEpisodes) {
+            return { season: totalSeasons, episode: episodesPerSeason, message: "Series has ended." };
+        }
+
+        const season = Math.floor(episodeIndex / episodesPerSeason) + 1;
+        const episode = (episodeIndex % episodesPerSeason) + 1;
+
+        return { season, episode };
+    }
+  </script>  
+</body>
+</html>
