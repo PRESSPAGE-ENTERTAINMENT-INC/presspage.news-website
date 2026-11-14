@@ -88,7 +88,7 @@
         const edition = getSeasonAndEpisode('2018-09-01', totalSeasons, episodesPerSeason, frequency, today.toISOString().split('T')[0]);
         const editionNumber = Number(edition.season - 1) * Number(episodesPerSeason) + Number(edition.episode);
 
-        document.getElementById('edition').textContent = `Edition #${editionNumber}`;
+        document.getElementById('edition').textContent = `Edition: Season ${edition.season}, Episode ${edition.episode} (#${editionNumber})`;
 
         document.getElementById('title').innerHTML = settings.news_website_title;
         document.title = settings.news_website_title;
@@ -111,7 +111,7 @@
 
         const edition = getSeasonAndEpisode('2018-09-01', totalSeasons, episodesPerSeason, frequency, today.toISOString().split('T')[0]);
         const editionNumber = Number(edition.season - 1) * Number(episodesPerSeason) + Number(edition.episode);
-        document.getElementById('edition').textContent = `Edition #${editionNumber}`;        
+        document.getElementById('edition').textContent = `Edition: Season ${edition.season}, Episode ${edition.episode} (#${editionNumber})`;        
       })
 
         /**
