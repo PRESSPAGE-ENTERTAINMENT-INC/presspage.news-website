@@ -99,6 +99,13 @@
       })
       .catch(function(error){
         //showMessage("error","Error obtaining Settings",error.message);
+         const options = { year: 'numeric', month: 'long', day: 'numeric' };
+         document.getElementById('date').textContent = today.toLocaleDateString('en-US', options);
+         if (today.getFullYear() > 2018) {
+            document.getElementById('year').textContent = `2018-${today.getFullYear()}`;
+         } else {
+            document.getElementById('year').textContent = '2018';
+         }
       })
 
         /**
