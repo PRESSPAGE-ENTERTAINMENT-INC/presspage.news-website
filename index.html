@@ -86,9 +86,8 @@
         const frequency = settings.season_episode_frequency; // Frequency of episodes (daily, weekly, monthly)
 
         const edition = getSeasonAndEpisode('2018-09-01', totalSeasons, episodesPerSeason, frequency, today.toISOString().split('T')[0]);
-        console.log(edition);
         const editionNumber = Number(edition.season - 1) * Number(episodesPerSeason) + Number(edition.episode);
-        console.log(editionNumber);
+
         document.getElementById('edition').textContent = `Edition #${editionNumber}`;
 
         document.getElementById('title').innerHTML = settings.news_website_title;
@@ -106,6 +105,13 @@
          } else {
             document.getElementById('year').textContent = '2018';
          }
+        const episodesPerSeason = 40; // Number of episodes per season
+        const totalSeasons = 100; // Total number of seasons
+        const frequency = 'daily'; // Frequency of episodes (daily, weekly, monthly)
+
+        const edition = getSeasonAndEpisode('2018-09-01', totalSeasons, episodesPerSeason, frequency, today.toISOString().split('T')[0]);
+        const editionNumber = Number(edition.season - 1) * Number(episodesPerSeason) + Number(edition.episode);
+        document.getElementById('edition').textContent = `Edition #${editionNumber}`;        
       })
 
         /**
