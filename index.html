@@ -77,7 +77,14 @@
     const today = new Date();
 
     window.onload = async function() {
-      fetch("/settings.json")
+      document.getElementById('date').textContent = today.toLocaleDateString('en-US', options);
+      if (today.getFullYear() > 2018) {
+        document.getElementById('year').textContent = `2018-${today.getFullYear()}`;
+      } else {
+        document.getElementById('year').textContent = '2018';
+      }
+
+      fetch("settings.json")
       .then(res => res.json())
       .then(function(settings){
         // Format the date
@@ -86,7 +93,7 @@
         const frequency = settings.season_episode_frequency; // Frequency of episodes (daily, weekly, monthly)
 
         const edition = getSeasonAndEpisode('2018-09-01', totalSeasons, episodesPerSeason, frequency, today.toISOString().split('T')[0]);
-        const editionNumber = Number(edition.season - 1) * Number(episodesPerSeason) + Number(edition.episode);
+        const editionNumber = Number(edition.episodeIndex);
 
         document.getElementById('edition').textContent = `Edition: Season ${edition.season}, Episode ${edition.episode} (#${editionNumber})`;
 
@@ -99,18 +106,12 @@
       .catch(function(error){
         //showMessage("error","Error obtaining Settings",error.message);
          const options = { year: 'numeric', month: 'long', day: 'numeric' };
-         document.getElementById('date').textContent = today.toLocaleDateString('en-US', options);
-         if (today.getFullYear() > 2018) {
-            document.getElementById('year').textContent = `2018-${today.getFullYear()}`;
-         } else {
-            document.getElementById('year').textContent = '2018';
-         }
         const episodesPerSeason = 40; // Number of episodes per season
         const totalSeasons = 100; // Total number of seasons
         const frequency = 'daily'; // Frequency of episodes (daily, weekly, monthly)
 
         const edition = getSeasonAndEpisode('2018-09-01', totalSeasons, episodesPerSeason, frequency, today.toISOString().split('T')[0]);
-        const editionNumber = Number(edition.season - 1) * Number(episodesPerSeason) + Number(edition.episode);
+        const editionNumber = Number(edition.episodeIndex);
         document.getElementById('edition').textContent = `Edition: Season ${edition.season}, Episode ${edition.episode} (#${editionNumber})`;        
       })
 
@@ -340,7 +341,7 @@
         const season = Math.floor(episodeIndex / episodesPerSeason) + 1;
         const episode = (episodeIndex % episodesPerSeason) + 1;
 
-        return { season, episode };
+        return { season, episode, episodeIndex };
     }
   </script>  
 </body>
