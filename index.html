@@ -77,14 +77,6 @@
     const today = new Date();
 
     window.onload = async function() {
-      const options = { year: 'numeric', month: 'long', day: 'numeric' };
-      document.getElementById('date').textContent = today.toLocaleDateString('en-US', options);
-      if (today.getFullYear() > 2018) {
-        document.getElementById('year').textContent = `2018-${today.getFullYear()}`;
-      } else {
-        document.getElementById('year').textContent = '2018';
-      }
-
       fetch("settings.json")
       .then(res => res.json())
       .then(function(settings){
@@ -109,6 +101,14 @@
         const episodesPerSeason = 40; // Number of episodes per season
         const totalSeasons = 100; // Total number of seasons
         const frequency = 'daily'; // Frequency of episodes (daily, weekly, monthly)
+        
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('date').textContent = today.toLocaleDateString('en-US', options);
+        if (today.getFullYear() > 2018) {
+          document.getElementById('year').textContent = `2018-${today.getFullYear()}`;
+        } else {
+          document.getElementById('year').textContent = '2018';
+        }
 
         const edition = getSeasonAndEpisode('2018-09-01', totalSeasons, episodesPerSeason, frequency, today.toISOString().split('T')[0]);
         const editionNumber = Number(edition.episodeIndex);
